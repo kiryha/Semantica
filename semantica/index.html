@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semantica</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d0d0d;
+      color: #ddd;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.4rem;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .calc {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .field {
+      font-size: 1.75rem;
+      font-weight: 300;
+      width: 260px;
+      padding: 0.5em 0.75em;
+      border-radius: 10px;
+      border: 1px solid #2a2a2a;
+      background: #161616;
+      color: #e0e0e0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input.field { caret-color: #7c6fff; }
+    input.field:focus {
+      border-color: #7c6fff44;
+      box-shadow: 0 0 0 3px #7c6fff18;
+    }
+
+    .equals { font-size: 2rem; color: #333; user-select: none; }
+
+    #result { color: #9d8fff; min-height: 1.4em; }
+    #result.error { color: #ff6b6b; font-size: 1.1rem; }
+    #result.loading { color: #444; font-style: italic; }
+
+    .hint { font-size: 0.75rem; color: #333; letter-spacing: 0.05em; }
+    .hint kbd {
+      background: #1e1e1e; border: 1px solid #2e2e2e;
+      border-radius: 4px; padding: 0.1em 0.4em;
+      font-family: inherit; color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header><h1>Semantica</h1></header>
+
+  <div class="calc">
+    <input id="expr" class="field" type="text"
+           placeholder="king − man + woman"
+           autocomplete="off" spellcheck="false" />
+    <span class="equals">=</span>
+    <div id="result" class="field"></div>
+  </div>
+
+  <p class="hint">Press <kbd>Enter</kbd> to compute &nbsp;·&nbsp; combine words with <kbd>+</kbd> and <kbd>−</kbd></p>
+
+  <script>
+    const exprEl   = document.getElementById('expr');
+    const resultEl = document.getElementById('result');
+    let debounceId = null;
+
+    exprEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { clearTimeout(debounceId); compute(); }
+    });
+    exprEl.addEventListener('input', () => {
+      clearTimeout(debounceId);
+      debounceId = setTimeout(compute, 700);
+    });
+
+    async function compute() {
+      const expr = exprEl.value.trim();
+      if (!expr) { setResult('', ''); return; }
+      setResult('…', 'loading');
+      const res  = await fetch('/compute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ expression: expr }),
+      });
+      const data = await res.json();
+      data.error ? setResult(data.error, 'error') : setResult(data.result, '');
+    }
+
+    function setResult(text, cls) {
+      resultEl.textContent = text;
+      resultEl.className   = 'field ' + cls;
+    }
+  </script>
+</body>
+</html>
