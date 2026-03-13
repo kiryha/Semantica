@@ -24,7 +24,7 @@
       font-weight: 400;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: #555;
+      color: #7a7a7a;
     }
 
     .calc {
@@ -36,8 +36,8 @@
     .field {
       font-size: 1.75rem;
       font-weight: 300;
-      width: 260px;
-      padding: 0.5em 0.75em;
+      width: 360px;
+      padding: 0.25em 0.75em;
       border-radius: 10px;
       border: 1px solid #2a2a2a;
       background: #161616;
@@ -74,7 +74,7 @@
            placeholder="king − man + woman"
            autocomplete="off" spellcheck="false" />
     <span class="equals">=</span>
-    <div id="result" class="field"></div>
+    <input id="result" class="field" type="text" readonly />
   </div>
 
   <p class="hint">Press <kbd>Enter</kbd> to compute &nbsp;·&nbsp; combine words with <kbd>+</kbd> and <kbd>−</kbd></p>
@@ -106,7 +106,7 @@
     }
 
     function setResult(text, cls) {
-      resultEl.textContent = text;
+      resultEl.value = text;
       resultEl.className   = 'field ' + cls;
     }
   </script>
