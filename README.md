@@ -64,8 +64,7 @@ The core logic uses [GloVe embeddings](https://nlp.stanford.edu/projects/glove/)
 3.  Place `glove.6B.300d.txt` into the `/database` folder.
 
 ### 3. Usage
-Run the main script and enter an expression:
-```bash
-python main.py
-> king - man + woman
-Result: queen
+- Install Python, 
+- Download/clone repo, 
+- Download embedings file (database setup), 
+- Fix and run semantica.bat (change path to Python).
