@@ -25,12 +25,25 @@ This project utilizes **GloVe (Global Vectors for Word Representation)**. These 
 
 ---
 
-## Semantic Arithmetic
-The true magic of Semantica is that because words are numbers, you can perform math on them to uncover cultural relationships and linguistic logic.
+## Semantic Arithmetic & Spatial Logic
+The true magic of Semantica is that because words are numbers, you can perform math on them to uncover cultural relationships and navigate linguistic clusters.
+
+### 1. Relational Analogies (`+` and `-`)
+By adding and subtracting vectors, you can "transport" meanings across the map.
 
 $$Vector(\text{"King"}) - Vector(\text{"Man"}) + Vector(\text{"Woman"}) \approx Vector(\text{"Queen"})$$
 
 By subtracting the "man" vector from "king," we mathematically strip away the concept of masculinity while retaining "royalty." Adding "woman" applies femininity to that royal essence, landing us at the coordinates for "queen."
+
+### 2. Outlier Detection: The "Odd One Out" (`|`)
+The `|` operator allows you to perform **Spatial Filtering**. If you provide a list of words, Semantica will identify which word mathematically "doesn't belong."
+
+**Example:** `apple | banana | meat | orange` $\rightarrow$ **"meat"**
+
+**How it works:**
+1. **The Centroid:** Semantica calculates the "Center of Gravity" (the average coordinate) for all words in your list.
+2. **The Distance Scan:** It then measures the distance from each word to that center.
+3. **The Outlier:** Words like *apple*, *banana*, and *orange* exist in a tight "Fruit Cluster." *Meat*, however, is located in a distant part of the 300D space. Semantica flags the word with the highest distance from the group as the outlier.
 
 ---
 
@@ -62,6 +75,8 @@ The core logic uses [GloVe embeddings](https://nlp.stanford.edu/projects/glove/)
 3.  Place `glove.6B.300d.txt` into the `/database` folder.
 
 ### 3. Usage
+![Semantica Header](images/find_outlier.jpeg)
+
 - Install Python, 
 - Download/clone repo, 
 - Download embedings file (database setup), 

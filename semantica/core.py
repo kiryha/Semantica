@@ -13,8 +13,26 @@ def load_glove(path):
     print(f"Done. {len(model)} words loaded.")
     return model
 
+
+# ---------------------------------------------------------------------------
+# Parser
+# ---------------------------------------------------------------------------
+
 def parse_expression(expression):
-    tokens = re.split(r'\s*([+\-])\s*', expression.lower().strip())
+    """
+    Parse an expression string into a structured dict.
+
+    Supported modes:
+      'math'   — "king - man + woman"  →  {mode, pairs: [(word, sign), ...]}
+      'filter' — "apple | banana | hammer"  →  {mode, words: [...]}
+    """
+    expression = expression.lower().strip()
+
+    if '|' in expression:
+        words = [word.strip() for word in expression.split('|') if word.strip()]
+        return {'mode': 'filter', 'words': words}
+
+    tokens = re.split(r'\s*([+\-])\s*', expression)
     word_sign_pairs = []
     sign = 1
     for token in tokens:
@@ -23,43 +41,14 @@ def parse_expression(expression):
         elif token:
             word_sign_pairs.append((token, sign))
             sign = 1
-    return word_sign_pairs
+    return {'mode': 'math', 'pairs': word_sign_pairs}
 
 
-def find_closest_word_cosine(target_vector, model, excluded_words):
-    """
-    Use Cosine Similarity (the angle between vectors). Slower.
-    """
-
-    closest_word = None
-    # We want the highest similarity (closest to 1.0)
-    max_similarity = -1.0 
-    
-    # Pre-calculate norm of target_vector to save time
-    target_norm = np.linalg.norm(target_vector)
-    if target_norm == 0: return None
-
-    for word, word_vector in model.items():
-        if word in excluded_words:
-            continue
-            
-        # Cosine Similarity Formula: (A dot B) / (||A|| * ||B||)
-        word_norm = np.linalg.norm(word_vector)
-        if word_norm == 0: continue
-        
-        similarity = np.dot(target_vector, word_vector) / (target_norm * word_norm)
-        
-        if similarity > max_similarity:
-            max_similarity = similarity
-            closest_word = word
-            
-    return closest_word
+# ---------------------------------------------------------------------------
+# Computation
+# ---------------------------------------------------------------------------
 
 def find_closest_word(target_vector, model, excluded_words):
-    """
-    using Euclidean Distance
-    """
-
     closest_word = None
     min_distance = float('inf')
     for word, word_vector in model.items():
@@ -71,8 +60,7 @@ def find_closest_word(target_vector, model, excluded_words):
             closest_word = word
     return closest_word
 
-def solve(expression, model):
-    word_sign_pairs = parse_expression(expression)
+def compute_math(word_sign_pairs, model):
     result_vector = np.zeros(300, dtype=np.float32)
     input_words = set()
     for word, sign in word_sign_pairs:
@@ -81,5 +69,24 @@ def solve(expression, model):
         result_vector += sign * model[word]
         input_words.add(word)
     return find_closest_word(result_vector, model, input_words)
+
+def compute_odd_one_out(words, model):
+    valid_words = [word for word in words if word in model]
+    if not valid_words:
+        return None
+    centroid = np.mean([model[word] for word in valid_words], axis=0)
+    return max(valid_words, key=lambda word: np.linalg.norm(model[word] - centroid))
+
+
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
+
+def solve(expression, model):
+    parsed = parse_expression(expression)
+    if parsed['mode'] == 'math':
+        return compute_math(parsed['pairs'], model)
+    if parsed['mode'] == 'filter':
+        return compute_odd_one_out(parsed['words'], model)
 
 embeddings = load_glove(GLOVE_PATH)
