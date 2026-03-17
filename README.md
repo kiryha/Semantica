@@ -36,7 +36,7 @@ By subtracting the "man" vector from "king," we mathematically strip away the co
 
 ---
 
-## 🛠 Tech Stack & Architecture
+## Tech Stack & Architecture
 
 Semantica is built as a lightweight, high-performance engine for spatial language analysis.
 
