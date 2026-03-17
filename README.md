@@ -3,8 +3,6 @@
 
 ![Semantica Header](images/semantica.jpeg)
 
-> "A word is known by the company it keeps." — J.R. Firth
-
 Semantica is a navigational tool for the hidden "map" of human language. It treats language not as a sequence of letters, but as a high-dimensional geometric space where word meaning is defined by physical coordinates.
 
 ---
